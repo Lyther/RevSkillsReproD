@@ -1,0 +1,21 @@
+{
+  "name": "rev-skills-repro",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Reproduction workspace for Lyther/rev-skills (pinned submodule + overlay)",
+  "type": "module",
+  "bin": {
+    "rev-skills-repro": "src/repro.mjs"
+  },
+  "scripts": {
+    "test": "node src/repro.mjs check && node --test tests/repro.test.mjs tests/overlay.test.mjs",
+    "test:repro": "node src/repro.mjs check && node --test tests/repro.test.mjs",
+    "test:overlay": "node --test tests/overlay.test.mjs",
+    "start": "node src/repro.mjs check",
+    "setup": "node src/repro.mjs install"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "Apache-2.0"
+}
