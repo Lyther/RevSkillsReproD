@@ -1,0 +1,13 @@
+The wrapper files in this repository (Makefile, Dockerfile,
+docker-compose.yml, and related repro metadata) are licensed under the
+Apache License, Version 2.0. The full license text is at
+vendor/rev-skills/LICENSE.
+
+vendor/rev-skills is dslsdzc/rev-skills at tag v0.0.5
+(commit 824c0e5c5e9278ffa9cc8188706d4ecef7e5d6e6) and keeps its own
+dual license:
+
+- Skill documentation (.claude/skills/ and related docs): CC BY 4.0
+  (vendor/rev-skills/LICENSE-docs.md). Attribution: dslsdzc/rev-skills.
+- Tooling (bin/, validate.mjs, tests/): Apache-2.0
+  (vendor/rev-skills/LICENSE).

@@ -1,0 +1,3 @@
+[submodule "vendor/rev-skills"]
+	path = vendor/rev-skills
+	url = https://github.com/dslsdzc/rev-skills.git

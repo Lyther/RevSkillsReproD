@@ -1,0 +1,10 @@
+.git
+**/.git
+**/.DS_Store
+**/node_modules
+*.log
+.env
+README.md
+Makefile
+docker-compose.yml
+.env.example

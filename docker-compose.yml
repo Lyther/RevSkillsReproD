@@ -1,0 +1,21 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: revskillsrepro-app:0.0.5
+    env_file:
+      - .env
+    working_dir: /app
+    networks:
+      - revskills
+    healthcheck:
+      test: ["CMD", "node", "validate.mjs"]
+      interval: 30s
+      timeout: 15s
+      retries: 5
+      start_period: 10s
+
+networks:
+  revskills:
+    driver: bridge
