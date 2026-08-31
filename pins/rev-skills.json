@@ -1,0 +1,6 @@
+{
+  "source_url": "https://github.com/Lyther/rev-skills",
+  "commit": "bc7fac97f5898c5714e74ac18823fece715f48a9",
+  "treeHash": "eefce60d1154dfd1a1674a46bdb21c774684ac256a12759877fc55626fa37276",
+  "note": "origin/main after v0.0.5; marketplace.json 0.0.4 → 0.0.5. treeHash is sha256 of sorted relpath:sha256 lines under .claude/skills."
+}
