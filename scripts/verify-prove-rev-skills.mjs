@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Clean-room prove harness for shipped rev-skills bits. Not a product substitute.
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import {
   existsSync,
   mkdirSync,
@@ -190,16 +190,29 @@ function proveInstaller() {
   rmSync(home, { recursive: true, force: true });
 }
 
-function proveRobustness() {
-  const homes = Array.from({ length: 5 }, () => mkdtempSync(join(tmpdir(), 'rev-prove-par-')));
-  const procs = homes.map((cwd) => {
-    const child = spawnSync(process.execPath, [INSTALLER, '--project', '--target', 'cursor'], {
-      encoding: 'utf8',
-      timeout: 30000,
-      cwd,
+function spawnNode(script, args, opts = {}) {
+  return new Promise((resolve) => {
+    const child = spawn(process.execPath, [script, ...args], {
+      cwd: opts.cwd,
+      env: { ...process.env, ...(opts.env ?? {}) },
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
-    return { cwd, status: child.status, n: existsSync(join(cwd, '.cursor', 'rules')) ? readdirSync(join(cwd, '.cursor', 'rules')).filter((f) => f.endsWith('.mdc')).length : 0 };
+    const timer = setTimeout(() => {
+      child.kill('SIGTERM');
+    }, opts.timeout ?? 30000);
+    child.on('close', (status, signal) => {
+      clearTimeout(timer);
+      resolve({ status: status ?? 1, signal });
+    });
   });
+}
+
+async function proveRobustness() {
+  const homes = Array.from({ length: 5 }, () => mkdtempSync(join(tmpdir(), 'rev-prove-par-')));
+  const procs = await Promise.all(homes.map(async (cwd) => {
+    const child = await spawnNode(INSTALLER, ['--project', '--target', 'cursor'], { cwd, timeout: 30000 });
+    return { cwd, status: child.status, n: existsSync(join(cwd, '.cursor', 'rules')) ? readdirSync(join(cwd, '.cursor', 'rules')).filter((f) => f.endsWith('.mdc')).length : 0 };
+  }));
   const allOk = procs.every((p) => p.status === 0 && p.n === 121);
   record('R-parallel-5', '5 parallel cursor installs each write 121 rules', allOk ? 'PASS' : 'FAIL', JSON.stringify(procs.map((p) => ({ status: p.status, n: p.n }))));
   for (const cwd of homes) rmSync(cwd, { recursive: true, force: true });
@@ -264,11 +277,11 @@ function proveWxsource() {
   record('W-help', 'wxsource without args prints usage', /kanxue|用法/.test(help.stdout + help.stderr) ? 'PASS' : 'FAIL', `status=${help.status}`);
 }
 
-function main() {
+async function main() {
   console.log(`PROVE_ROOT=${ROOT}`);
   proveStructure();
   proveInstaller();
-  proveRobustness();
+  await proveRobustness();
   proveAdversary();
   proveWxsource();
   const pass = findings.filter((f) => f.verdict === 'PASS').length;
@@ -284,4 +297,7 @@ function main() {
   if (fail > 0) process.exit(1);
 }
 
-main();
+main().catch((err) => {
+  console.error(err instanceof Error ? err.stack ?? err.message : String(err));
+  process.exit(1);
+});

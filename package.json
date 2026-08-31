@@ -8,8 +8,8 @@
     "rev-skills-repro": "src/repro.mjs"
   },
   "scripts": {
-    "test": "node src/repro.mjs check && node --test tests/repro.test.mjs tests/overlay.test.mjs",
-    "test:repro": "node src/repro.mjs check && node --test tests/repro.test.mjs",
+    "test": "node src/repro.mjs check && node --test tests/repro.test.mjs tests/overlay.test.mjs tests/review-findings.test.mjs",
+    "test:repro": "node src/repro.mjs check && node --test tests/repro.test.mjs tests/review-findings.test.mjs",
     "test:overlay": "node --test tests/overlay.test.mjs",
     "start": "node src/repro.mjs check",
     "setup": "node src/repro.mjs install"

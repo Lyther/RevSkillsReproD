@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { existsSync, realpathSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -74,6 +74,15 @@ function main() {
   process.exit(2);
 }
 
-if (process.argv[1] && process.argv[1].endsWith('repro.mjs')) {
+function invokedAsCli() {
+  if (!process.argv[1]) return false;
+  try {
+    return realpathSync(process.argv[1]) === fileURLToPath(import.meta.url);
+  } catch {
+    return process.argv[1].endsWith('repro.mjs') || process.argv[1].endsWith('rev-skills-repro');
+  }
+}
+
+if (invokedAsCli()) {
   main();
 }

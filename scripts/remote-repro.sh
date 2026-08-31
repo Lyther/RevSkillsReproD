@@ -31,7 +31,11 @@ main() {
     command -v rsync >/dev/null 2>&1 || die "rsync is required"
     remote_host_ok "${HOST}" || die "DEPLOY_HOST has unsafe characters"
     remote_dir_ok "${REMOTE_DIR}" || die "REMOTE_DIR has unsafe characters"
-    local remote_q
+    local remote_home remote_q
+    remote_home="$(ssh -o BatchMode=yes "${HOST}" 'printf %s "$HOME"')" || die "cannot read remote HOME"
+    [[ -n "${remote_home}" ]] || die "remote HOME is empty"
+    REMOTE_DIR="$(remote_dir_expand_home "${REMOTE_DIR}" "${remote_home}")" || die "cannot expand REMOTE_DIR"
+    remote_dir_ok "${REMOTE_DIR}" || die "expanded REMOTE_DIR has unsafe characters"
     remote_q="$(remote_dir_quote "${REMOTE_DIR}")"
 
     log "deploying ${ROOT} -> ${HOST}:${REMOTE_DIR}"

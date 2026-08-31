@@ -15,6 +15,23 @@ remote_host_ok() {
     [[ "${host}" =~ ^[A-Za-z0-9._-]+$ ]]
 }
 
+# Expand a leading ~ to the given absolute home. Does not expand ~user.
+remote_dir_expand_home() {
+    local path="${1:-}"
+    local home="${2:-}"
+    [[ -n "${path}" && -n "${home}" ]] || return 1
+    [[ "${home}" == /* ]] || return 1
+    # Compare against a literal ~/ prefix. Tilde must not expand to $HOME here.
+    # shellcheck disable=SC2088
+    if [[ "${path}" == "~" ]]; then
+        printf '%s\n' "${home}"
+    elif [[ "${path}" == "~/"* ]]; then
+        printf '%s/%s\n' "${home}" "${path#"~/"}"
+    else
+        printf '%s\n' "${path}"
+    fi
+}
+
 remote_dir_quote() {
     printf '%q' "$1"
 }
