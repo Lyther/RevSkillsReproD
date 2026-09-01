@@ -1,0 +1,50 @@
+From d2bced84b4715483a226816034a9dee9b5d885e6 Mon Sep 17 00:00:00 2001
+From: overlay <overlay@local.invalid>
+Date: Mon, 31 Aug 2026 14:06:16 +0800
+Subject: [PATCH] Add machine-readable guards on sensitive RE skills
+
+---
+ .claude/skills/re-cracking/SKILL.md | 1 +
+ .claude/skills/re-exploit/SKILL.md  | 1 +
+ .claude/skills/re-keygen/SKILL.md   | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/.claude/skills/re-cracking/SKILL.md b/.claude/skills/re-cracking/SKILL.md
+index c83ca41..daf37da 100644
+--- a/.claude/skills/re-cracking/SKILL.md
++++ b/.claude/skills/re-cracking/SKILL.md
+@@ -6,6 +6,7 @@ description: >
+   子技能：[[re-license]] [[re-patching]] [[re-keygen]] [[re-drm]]。
+   触发词：破解、crack、注册码、序列号、授权验证、绕过验证、打补丁、patch、keygen、注册机、授权绕过。
+ capabilities: [license-analysis]
++guard: {"require_authorization": true, "forbidden": ["unauthorized_cracking", "commercial_bypass", "keygen_distribution"]}
+ ---
+ 
+ # 软件破解（授权定位 / 补丁 / 注册机）
+diff --git a/.claude/skills/re-exploit/SKILL.md b/.claude/skills/re-exploit/SKILL.md
+index 004deb9..588fe78 100644
+--- a/.claude/skills/re-exploit/SKILL.md
++++ b/.claude/skills/re-exploit/SKILL.md
+@@ -3,6 +3,7 @@ name: re-exploit
+ description: >
+   利用开发：ROP 链构造、堆利用。
+   触发词：ROP、堆利用、fastbin、tcache、利用开发、exploit
++guard: {"require_authorization": true, "forbidden": ["unauthorized_exploitation", "weaponization_against_third_party"]}
+ ---
+ 
+ # 利用开发（ROP 链构造 / 堆利用）
+diff --git a/.claude/skills/re-keygen/SKILL.md b/.claude/skills/re-keygen/SKILL.md
+index 247356a..fbdb50d 100644
+--- a/.claude/skills/re-keygen/SKILL.md
++++ b/.claude/skills/re-keygen/SKILL.md
+@@ -1,6 +1,7 @@
+ ---
+ name: re-keygen
+ description: 注册机算法还原。触发词：注册机、keygen、算法还原、序列号生成
++guard: {"require_authorization": true, "forbidden": ["unauthorized_cracking", "commercial_bypass", "keygen_distribution"]}
+ ---
+ 
+ # 注册机算法还原（keygen）
+-- 
+2.50.1 (Apple Git-155)
+

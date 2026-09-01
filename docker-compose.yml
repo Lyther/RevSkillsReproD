@@ -10,7 +10,7 @@ services:
     networks:
       - revskills
     healthcheck:
-      test: ["CMD", "node", "validate.mjs"]
+      test: ["CMD", "node", "vendor/rev-skills/validate.mjs"]
       interval: 30s
       timeout: 15s
       retries: 5
