@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, symlinkSync } from 'node:fs';
+import { mkdtempSync, readFileSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { test } from 'node:test';
@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const LIB = join(ROOT, 'scripts', 'lib', 'remote-dir.sh');
+const BYTELLM_KEY = join(ROOT, 'scripts', 'lib', 'bytellm-key.sh');
 const REMOTE_REPRO = join(ROOT, 'scripts', 'remote-repro.sh');
 const PROVE_REMOTE = join(ROOT, 'scripts', 'verify-prove-remote.sh');
 const PROVE_HARNESS = join(ROOT, 'scripts', 'verify-prove-rev-skills.mjs');
@@ -64,6 +65,31 @@ test('test:repro stays image-safe without scripts/', () => {
   assert.doesNotMatch(pkg.scripts['test:repro'], /review-findings\.test\.mjs/);
   assert.match(docker, /npm run test:repro/);
   assert.doesNotMatch(docker, /COPY scripts/);
+});
+
+test('bytellm_read_key rejects non-numeric line numbers', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'bytellm-line-'));
+  const keyFile = join(dir, 'bytellm');
+  writeFileSync(keyFile, 'real-test-key\n');
+  const inject = bash(`
+    set -euo pipefail
+    source "${BYTELLM_KEY}"
+    bytellm_read_key "${keyFile}" '1s/.*/HACKED/'
+    printf '\\nstatus=%s\\n' "\$?"
+  `);
+  assert.notEqual(inject.status, 0, `sed line_no must fail-close, got stdout=${inject.stdout}`);
+  assert.doesNotMatch(inject.stdout, /HACKED/);
+  const ok = bash(`
+    set -uo pipefail
+    source "${BYTELLM_KEY}"
+    got="$(bytellm_read_key "${keyFile}" 1)"
+    rc=\$?
+    printf 'got=%s\\nrc=%s\\n' "\${got}" "\${rc}"
+    exit "\${rc}"
+  `);
+  assert.equal(ok.status, 0, ok.stderr);
+  assert.match(ok.stdout, /got=real-test-key/);
+  assert.match(ok.stdout, /rc=0/);
 });
 
 test('R-parallel-5 launches installer children concurrently', () => {

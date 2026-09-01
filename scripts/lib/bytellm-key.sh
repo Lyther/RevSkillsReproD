@@ -18,6 +18,7 @@ bytellm_read_key() {
     local line_no="${2:-11}"
     local raw name
     [[ -f "${file}" ]] || return 1
+    [[ "${line_no}" =~ ^[1-9][0-9]*$ ]] || return 1
     raw="$(sed -n "${line_no}p" "${file}" | tr -d '\r\n')"
     [[ -n "${raw}" ]] || return 1
     [[ "${raw}" != \#* ]] || return 1
