@@ -57,6 +57,15 @@ test('verify-prove-remote fail-closes captured proofs and honors REMOTE_DIR', ()
   assert.match(src, /exit "\$\{fail\}"/);
 });
 
+test('test:repro stays image-safe without scripts/', () => {
+  const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'));
+  const docker = readFileSync(join(ROOT, 'Dockerfile'), 'utf8');
+  assert.match(pkg.scripts.test, /review-findings\.test\.mjs/);
+  assert.doesNotMatch(pkg.scripts['test:repro'], /review-findings\.test\.mjs/);
+  assert.match(docker, /npm run test:repro/);
+  assert.doesNotMatch(docker, /COPY scripts/);
+});
+
 test('R-parallel-5 launches installer children concurrently', () => {
   const src = readFileSync(PROVE_HARNESS, 'utf8');
   const start = src.indexOf("const homes = Array.from({ length: 5 }");
